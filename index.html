@@ -17,7 +17,11 @@ input,textarea{font-family:inherit}
 .top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:24px;letter-spacing:-.5px}
 .logo .bubble{background:#fff;color:var(--red);width:42px;height:42px;border-radius:14px 14px 14px 4px;display:grid;place-items:center;font-size:24px;font-weight:900;box-shadow:0 4px 0 var(--dark)}
-.top-actions{display:flex;gap:8px}
+.top-actions{display:flex;gap:8px;align-items:center}
+.sync{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.15);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800;white-space:nowrap}
+.sync::before{content:'';width:9px;height:9px;border-radius:50%;background:#FFD1D8;flex:none}
+.sync.on::before{background:#7CF0A0;box-shadow:0 0 0 3px rgba(124,240,160,.25)}
+.mirror-note{width:100%;text-align:center;background:rgba(255,255,255,.14);border:2px dashed rgba(255,255,255,.55);border-radius:18px;padding:16px;font-weight:800;font-size:18px}
 .top-actions button{background:rgba(255,255,255,.15);color:#fff;width:44px;height:44px;border-radius:13px;display:grid;place-items:center}
 .top-actions button:hover{background:rgba(255,255,255,.26)}
 .top-actions button.dim{opacity:.35}
@@ -170,6 +174,7 @@ textarea:focus{outline:none;border-style:solid}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:60;display:none}
 @media (max-width:560px){
   .top{padding:10px 14px}.logo{font-size:20px}
+  .sync{padding:8px;font-size:0;gap:0}
   .panel{padding:18px;border-radius:22px}
   .ring{width:92px;height:92px}.ring span{font-size:32px}
   .pill{font-size:14px;padding:7px 12px}
@@ -183,6 +188,7 @@ textarea:focus{outline:none;border-style:solid}
 <header class="top">
   <div class="logo"><span class="bubble">א</span><span>רפאל אליאס</span></div>
   <div class="top-actions">
+    <span id="sync" class="sync" title="סטטוס סנכרון">מתחבר…</span>
     <button id="muteBtn" aria-label="צליל"></button>
     <button id="adminBtn" aria-label="אזור מנהל" title="אזור מנהל"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.2"/></svg></button>
   </div>
@@ -192,6 +198,8 @@ textarea:focus{outline:none;border-style:solid}
 <div id="toast"></div>
 <canvas id="confetti"></canvas>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 const DEFAULT_WORDS=["צילוב","גרעינים לבנים","סבא לוי","סבתא ברכה","אבישי","משה","גילה","ליאת","דבי","מור","אסף","שי","בר","רוני","מאיה","מייקי","אוראל","אביה","אדיר","אגם","לירן","הילה","יפה","גדעון","הרב משה","ברוריה","זבולון","רפאל","אתרוג","אבזוש נבט","פלוב","אורז אדום","אורז ירוק","עשבי בשמים","חלאס","קציצה","חוג משה","קוקו קרטופי"];
 const KEY='rafael-alias-v1';
@@ -200,12 +208,109 @@ const RING=2*Math.PI*52;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function fresh(){return{words:DEFAULT_WORDS.slice(),deck:[],settings:{time:60,target:20,skipPenalty:true,lastWord:true},setupNames:TEAM_DEFAULT.slice(0,2),teams:[],turn:0,turnCount:0,phase:'setup',history:[],round:null,pin:'1234',mute:false}}
+function fresh(){return{words:DEFAULT_WORDS.slice(),deck:[],settings:{time:60,target:20,skipPenalty:true,lastWord:true},setupNames:TEAM_DEFAULT.slice(0,2),teams:[],turn:0,turnCount:0,phase:'setup',history:[],round:null,pin:'1234',mute:false,gameAt:0,pending:[],cloudSynced:false}}
 function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){S.gameAt=Date.now();saveLocal();schedulePush()}
 let S=Object.assign(fresh(),load()||{});
 S.settings=Object.assign(fresh().settings,S.settings||{});
+if(!Array.isArray(S.pending))S.pending=[];
 const app=$('#app');
+
+/* ---------- cloud sync (Firebase / Firestore) ---------- */
+const FB_CONFIG={apiKey:"AIzaSyDGc2Nnf4C-P7FJ5utuexiGF-DqG53eH9Q",authDomain:"management-f690d.firebaseapp.com",projectId:"management-f690d",storageBucket:"management-f690d.firebasestorage.app",messagingSenderId:"728286093733",appId:"1:728286093733:web:5372a56e33338ef572c84c"};
+const COL='alias_rafael';
+const DEVICE=(()=>{const k=KEY+'-device';try{let d=localStorage.getItem(k);if(!d){d=Math.random().toString(36).slice(2,10);localStorage.setItem(k,d)}return d}catch(e){return Math.random().toString(36).slice(2,10)}})();
+const GAME_KEYS=['teams','turn','turnCount','phase','history','round','setupNames'];
+let db=null,gameReady=false,cfgReady=false,lastGameJSON='',lastCfgJSON='',pushT=null;
+const clean=o=>JSON.parse(JSON.stringify(o));
+const gamePayload=()=>{const o={};GAME_KEYS.forEach(k=>o[k]=S[k]);return o};
+const cfgPayload=()=>({settings:S.settings,pin:S.pin});
+const isController=()=>!!(S.round&&S.round.by===DEVICE);
+function setBadge(on){const b=$('#sync');b.className='sync '+(on?'on':'off');b.textContent=on?'מחובר לענן':'מצב מקומי';b.title=on?'המילים והנתונים משותפים לכל המכשירים':'אין חיבור לענן, השינויים נשמרים במכשיר הזה בלבד'}
+function cloudErr(e){console.warn('cloud',e);setBadge(false)}
+function schedulePush(){if(!db)return;clearTimeout(pushT);pushT=setTimeout(pushNow,250)}
+function pushNow(){
+  if(!db)return;
+  if(gameReady){const g=JSON.stringify(gamePayload());if(g!==lastGameJSON){lastGameJSON=g;db.collection(COL).doc('game').set(Object.assign(clean(gamePayload()),{at:S.gameAt||Date.now(),by:DEVICE})).catch(cloudErr)}}
+  if(cfgReady){const c=JSON.stringify(cfgPayload());if(c!==lastCfgJSON){lastCfgJSON=c;db.collection(COL).doc('config').set(Object.assign(clean(cfgPayload()),{by:DEVICE})).catch(cloudErr)}}
+}
+function cloudWords(op,val){
+  if(!db){if(op==='add')S.pending.push(...val);saveLocal();return}
+  const ref=db.collection(COL).doc('words'),FV=firebase.firestore.FieldValue;
+  if(op==='add'&&val.length)ref.set({list:FV.arrayUnion(...val)},{merge:true}).catch(cloudErr);
+  else if(op==='del')ref.set({list:FV.arrayRemove(val)},{merge:true}).catch(cloudErr);
+  else if(op==='set')ref.set({list:val}).catch(cloudErr);
+}
+function applyWords(list){
+  const before=new Set(S.words),now=new Set(list);
+  const added=list.filter(w=>!before.has(w));
+  S.words=list.slice();
+  S.deck=S.deck.filter(w=>now.has(w));
+  added.forEach(w=>S.deck.splice(Math.floor(Math.random()*(S.deck.length+1)),0,w));
+  saveLocal();refresh(true);
+}
+function applyGame(d){
+  if(S.phase==='play'&&isController()){if(Array.isArray(d.teams)&&d.teams.length===S.teams.length)S.teams=d.teams;saveLocal();schedulePush();return}
+  const f=fresh();
+  GAME_KEYS.forEach(k=>{S[k]=d[k]!==undefined?d[k]:f[k]});
+  S.gameAt=d.at||Date.now();lastGameJSON=JSON.stringify(gamePayload());saveLocal();refresh(false);
+}
+function refresh(wordsOnly){
+  if(!adm.classList.contains('hidden')){
+    if(!admAuthed)return;
+    const ae=document.activeElement;
+    if(ae&&adm.contains(ae)&&ae.matches('input'))return;
+    const ta=$('#newWords'),v=ta?ta.value:null,foc=ae&&ae.id==='newWords';
+    rAdmin();
+    const nt=$('#newWords');if(nt&&v!=null){nt.value=v;if(foc)nt.focus()}
+    return;
+  }
+  if(wordsOnly)return;
+  const ae=document.activeElement;
+  if(ae&&app.contains(ae)&&ae.matches('input'))return;
+  if(S.phase==='play'&&isController())return;
+  render();
+}
+function initCloud(){
+  if(!window.firebase||!firebase.firestore){setBadge(false);return}
+  try{firebase.initializeApp(FB_CONFIG);db=firebase.firestore()}catch(e){cloudErr(e);db=null;return}
+  const col=db.collection(COL);
+  col.doc('words').onSnapshot({includeMetadataChanges:true},snap=>{
+    setBadge(!snap.metadata.fromCache);
+    if(!snap.exists){if(!snap.metadata.fromCache){col.doc('words').set({list:S.words}).catch(cloudErr);S.pending=[];S.cloudSynced=true;saveLocal()}return}
+    const list=(snap.data().list)||[];
+    if(!snap.metadata.fromCache){
+      const have=new Set(list);
+      const extra=[...(S.cloudSynced?[]:S.words.filter(w=>!DEFAULT_WORDS.includes(w))),...S.pending].filter((w,i,a)=>!have.has(w)&&a.indexOf(w)===i);
+      S.pending=[];S.cloudSynced=true;
+      if(extra.length)cloudWords('add',extra);
+    }
+    applyWords(list);
+  },cloudErr);
+  col.doc('config').onSnapshot(snap=>{
+    if(snap.metadata.hasPendingWrites)return;
+    if(!snap.exists){if(!snap.metadata.fromCache){cfgReady=true;pushNow()}return}
+    const d=snap.data();cfgReady=true;
+    if(d.by===DEVICE&&lastCfgJSON)return;
+    S.settings=Object.assign(fresh().settings,d.settings||{});if(d.pin)S.pin=d.pin;
+    lastCfgJSON=JSON.stringify(cfgPayload());saveLocal();
+    if(S.phase==='setup'||!adm.classList.contains('hidden'))refresh(false);
+  },cloudErr);
+  col.doc('game').onSnapshot(snap=>{
+    if(snap.metadata.hasPendingWrites)return;
+    if(!snap.exists){if(!snap.metadata.fromCache){gameReady=true;pushNow()}return}
+    const d=snap.data();
+    if(!gameReady){
+      if(snap.metadata.fromCache)return;
+      gameReady=true;
+      if((S.gameAt||0)>(d.at||0)){pushNow();return}
+      applyGame(d);return;
+    }
+    if(d.by===DEVICE)return;
+    applyGame(d);
+  },cloudErr);
+}
 
 /* ---------- sound ---------- */
 let AC;
@@ -240,7 +345,7 @@ function phaseLabel(){return({setup:'מסך פתיחה',ready:'ממתינים ל
 function render(){
   stopTimer();
   ({setup:rSetup,ready:rReady,play:rPlay,last:rLast,review:rReview,board:rBoard,win:rWin}[S.phase]||rSetup)();
-  $('#adminBtn').classList.toggle('dim',S.phase==='play');
+  $('#adminBtn').classList.toggle('dim',S.phase==='play'&&isController());
 }
 function seg(k,vals){return `<div class="seg">${vals.map(v=>`<button class="${S.settings[k]==v?'on':''}" data-act="seg" data-k="${k}" data-v="${v}">${v}</button>`).join('')}</div>`}
 function sw(k){return `<button class="sw ${S.settings[k]?'on':''}" data-act="sw" data-k="${k}" aria-pressed="${!!S.settings[k]}"></button>`}
@@ -279,11 +384,11 @@ function rPlay(){
     <span class="pill soft">✔ <b id="cOk">${ok}</b> · ✖ <b id="cSk">${r.words.length-ok}</b></span>
   </div>
   <div class="word-card" id="wordCard"><div class="wc-inner"><span class="wc-label">הסבירו את</span><span class="wc-word" id="word">${esc(r.current)}</span></div></div>
-  <div class="play-btns">
+  ${isController()?`<div class="play-btns">
     <button class="btn btn-ok" data-act="ok">✔ נכון</button>
     <button class="btn btn-skip" data-act="skip">✖ דלג</button>
   </div>
-  <div class="keys">מקלדת: רווח או חץ ימינה = נכון · X או חץ שמאלה = דלג</div>
+  <div class="keys">מקלדת: רווח או חץ ימינה = נכון · X או חץ שמאלה = דלג</div>`:'<div class="mirror-note">הסבב מתנהל במכשיר אחר · התצוגה כאן מתעדכנת אוטומטית</div>'}
   </section>`;
   startTimer();
 }
@@ -341,7 +446,7 @@ function tick(){
   const fg=$('#rfg');if(fg)fg.style.strokeDashoffset=RING*(1-rem/(S.round.dur*1000));
   document.body.classList.toggle('urgent',sec<=10&&rem>0);
   if(sec!==lastSec){if(lastSec!==null&&sec<=5&&sec>0)sTick();lastSec=sec}
-  if(rem<=0)timeUp();
+  if(rem<=0){if(isController())timeUp();else stopTimer()}
 }
 function startGame(){
   const names=S.setupNames.map((s,i)=>s.trim()||TEAM_DEFAULT[i]);
@@ -349,11 +454,11 @@ function startGame(){
   S.turn=0;S.turnCount=0;S.history=[];S.round=null;S.phase='ready';save();render();
 }
 function startRound(){
-  S.round={team:S.turn,words:[],current:null,dur:S.settings.time,endsAt:Date.now()+S.settings.time*1000,last:null};
+  S.round={team:S.turn,words:[],current:null,dur:S.settings.time,endsAt:Date.now()+S.settings.time*1000,last:null,by:DEVICE};
   S.round.current=drawWord();S.phase='play';save();render();
 }
 function answer(ok){
-  if(S.phase!=='play')return;
+  if(S.phase!=='play'||!isController())return;
   const now=Date.now();if(now-lastTap<230)return;lastTap=now;
   S.round.words.push({w:S.round.current,ok});
   ok?sOk():sSkip();
@@ -424,7 +529,7 @@ function confetti(){
 let admTab='data',admAuthed=false;
 const adm=$('#admin');
 $('#adminBtn').onclick=openAdmin;
-function openAdmin(){if(S.phase==='play'){toast('אזור המנהל זמין בין סבבים');return}adm.classList.remove('hidden');admAuthed?rAdmin():rPin()}
+function openAdmin(){if(S.phase==='play'&&isController()){toast('אזור המנהל זמין בין סבבים');return}adm.classList.remove('hidden');admAuthed?rAdmin():rPin()}
 function closeAdmin(){adm.classList.add('hidden');render()}
 function rPin(){
   adm.innerHTML=`<div class="adm pinbox"><div class="adm-head"><span>אזור מנהל</span><button class="x" data-a="close" aria-label="סגירה">×</button></div>
@@ -434,11 +539,12 @@ function rPin(){
   setTimeout(()=>$('#pin')&&$('#pin').focus(),60);
 }
 function stat(v,l){return `<div class="stat"><b>${v}</b>${l}</div>`}
+function unseen(){const sh=new Set();S.history.forEach(h=>{h.words.forEach(x=>sh.add(x.w));if(h.last)sh.add(h.last.w)});return S.words.filter(w=>!sh.has(w)).length}
 function totals(){let ok=0,sk=0;S.history.forEach(h=>h.words.forEach(x=>x.ok?ok++:sk++));return{ok,sk}}
 function wordStats(){const m={};const add=(w,ok)=>{m[w]=m[w]||{ok:0,sk:0};ok?m[w].ok++:m[w].sk++};S.history.forEach(h=>{h.words.forEach(x=>add(x.w,x.ok));if(h.last)add(h.last.w,h.last.winner!=null)});return m}
 function aData(){
   const {ok,sk}=totals(),rate=ok+sk?Math.round(ok/(ok+sk)*100):0;
-  return `<div class="stats">${stat(S.words.length,'מילים במאגר')}${stat(S.deck.length,'נותרו בחפיסה')}${stat(S.history.length,'סבבים ששוחקו')}${stat(rate+'%','אחוז הצלחה כללי')}</div>
+  return `<div class="stats">${stat(S.words.length,'מילים במאגר')}${stat(unseen(),'טרם הוצגו במשחק')}${stat(S.history.length,'סבבים ששוחקו')}${stat(rate+'%','אחוז הצלחה כללי')}</div>
   ${S.teams.length?`<div class="tblwrap"><table class="t"><thead><tr><th>קבוצה</th><th>ניקוד</th><th>סבבים</th><th>נכונות</th><th>דילוגים</th><th>הצלחה</th><th>מילה אחרונה</th></tr></thead><tbody>
   ${S.teams.map((t,i)=>{const r=t.correct+t.skipped?Math.round(t.correct/(t.correct+t.skipped)*100):0;return `<tr><td><input class="tname" data-tn="${i}" value="${esc(t.name)}" aria-label="שם קבוצה"></td><td><div class="score-ed"><button data-a="sc" data-i="${i}" data-d="-1" aria-label="הורדת נקודה">−</button><b>${t.score}</b><button data-a="sc" data-i="${i}" data-d="1" aria-label="הוספת נקודה">+</button></div></td><td>${t.rounds}</td><td>${t.correct}</td><td>${t.skipped}</td><td>${r}%</td><td>${t.lastWins}</td></tr>`}).join('')}
   </tbody></table></div>`:'<div class="empty">עדיין לא התחיל משחק. הקבוצות והנתונים יופיעו כאן אחרי ההתחלה.</div>'}
@@ -456,7 +562,7 @@ function aWords(){
   return `<div class="add-box"><label class="lbl" for="newWords">הוספת מילים · מילה או צירוף בכל שורה</label>
   <textarea id="newWords" placeholder="מילה חדשה&#10;עוד מילה"></textarea>
   <div class="row"><button class="btn btn-red" data-a="addw">הוספה למאגר</button><span id="addMsg" class="muted" style="font-weight:700"></span></div></div>
-  <div class="row between"><b style="color:var(--deep)">${S.words.length} מילים במאגר · ${S.deck.length} נותרו בחפיסה</b>
+  <div class="row between"><b style="color:var(--deep)">${S.words.length} מילים במאגר · ${unseen()} טרם הוצגו במשחק</b>
   <div class="row" style="margin:0"><button class="btn btn-outline sm" data-a="reshuffle">ערבוב החפיסה מחדש</button><button class="btn btn-outline sm" data-a="restore">שחזור הרשימה המקורית</button></div></div>
   <div class="chips">${S.words.map((w,i)=>{const s=st[w];return `<span class="chip">${esc(w)}${s?` <small>✔${s.ok} ✖${s.sk}</small>`:''}<button data-a="delw" data-i="${i}" aria-label="מחיקת ${esc(w)}">×</button></span>`}).join('')||'<span class="muted">המאגר ריק</span>'}</div>`;
 }
@@ -485,9 +591,11 @@ function tryPin(){
 }
 function addWords(){
   const raw=$('#newWords').value.split(/\n|,/).map(s=>s.trim().replace(/\s+/g,' ')).filter(Boolean);
-  const have=new Set(S.words);let added=0,dup=0;
-  raw.forEach(w=>{if(have.has(w)){dup++;return}have.add(w);S.words.push(w);S.deck.splice(Math.floor(Math.random()*(S.deck.length+1)),0,w);added++});
-  save();rAdmin();
+  const have=new Set(S.words),nw=[];let dup=0;
+  raw.forEach(w=>{if(have.has(w)){dup++;return}have.add(w);S.words.push(w);S.deck.splice(Math.floor(Math.random()*(S.deck.length+1)),0,w);nw.push(w)});
+  const added=nw.length;
+  if(added)cloudWords('add',nw);
+  saveLocal();rAdmin();
   const m=$('#addMsg');if(m)m.textContent=raw.length?`נוספו ${added} מילים${dup?` · ${dup} כפולות סוננו`:''}`:'לא הוזנו מילים';
 }
 adm.addEventListener('click',e=>{
@@ -500,14 +608,14 @@ adm.addEventListener('click',e=>{
     case 'tab':admTab=b.dataset.k;rAdmin();break;
     case 'sc':S.teams[i].score=Math.max(0,S.teams[i].score+(+b.dataset.d));save();rAdmin();break;
     case 'addw':addWords();break;
-    case 'delw':{const w=S.words[i];S.words.splice(i,1);S.deck=S.deck.filter(x=>x!==w);save();rAdmin();toast(`"${w}" הוסרה מהמאגר`);break}
+    case 'delw':{const w=S.words[i];S.words.splice(i,1);S.deck=S.deck.filter(x=>x!==w);S.pending=S.pending.filter(x=>x!==w);cloudWords('del',w);saveLocal();rAdmin();toast(`"${w}" הוסרה מהמאגר`);break}
     case 'reshuffle':S.deck=shuffle(S.words.slice());save();rAdmin();toast('החפיסה עורבבה מחדש');break;
-    case 'restore':if(confirm('לשחזר את רשימת המילים המקורית? מילים שנוספו יימחקו.')){S.words=DEFAULT_WORDS.slice();S.deck=[];save();rAdmin();toast('הרשימה המקורית שוחזרה')}break;
+    case 'restore':if(confirm('לשחזר את רשימת המילים המקורית? מילים שנוספו יימחקו.')){S.words=DEFAULT_WORDS.slice();S.deck=[];S.pending=[];cloudWords('set',S.words);saveLocal();rAdmin();toast('הרשימה המקורית שוחזרה')}break;
     case 'seg':S.settings[b.dataset.k]=+b.dataset.v;save();rAdmin();break;
     case 'sw':S.settings[b.dataset.k]=!S.settings[b.dataset.k];save();rAdmin();break;
     case 'setpin':{const v=$('#newPin').value.trim();if(v.length<3){toast('קוד צריך לכלול לפחות 3 תווים');return}S.pin=v;save();rAdmin();toast('קוד המנהל עודכן');break}
     case 'newgame':if(confirm('להתחיל משחק חדש? הניקוד וההיסטוריה יתאפסו, המילים יישמרו.')){newGame();adm.classList.add('hidden')}break;
-    case 'wipe':if(confirm('איפוס מלא ימחק הכול, כולל מילים שנוספו וקוד המנהל. להמשיך?')){S=fresh();save();admAuthed=false;adm.classList.add('hidden');render();renderMute()}break;
+    case 'wipe':if(confirm('איפוס מלא ימחק הכול, כולל מילים שנוספו וקוד המנהל. להמשיך?')){const m=S.mute;S=fresh();S.mute=m;S.cloudSynced=true;cloudWords('set',S.words);save();admAuthed=false;adm.classList.add('hidden');render();renderMute()}break;
   }
 });
 adm.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='pin')tryPin()});
@@ -515,6 +623,7 @@ adm.addEventListener('change',e=>{if(e.target.dataset.tn!=null){const v=e.target
 
 renderMute();
 render();
+initCloud();
 </script>
 </body>
 </html>
