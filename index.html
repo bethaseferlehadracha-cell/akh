@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>רפאל אליאס</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--red:#C8102E;--dark:#8E0B20;--deep:#5E0615;--pink:#FCEBEB;--line:#F7C1C1;--green:#16803C}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:'Heebo',Arial,sans-serif;background-color:var(--red);color:#fff;min-height:100vh;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent;background-image:radial-gradient(rgba(255,255,255,.08) 2px,transparent 2.6px);background-size:26px 26px;transition:background-color .3s}
+body.urgent{background-color:#A40B23}
+button{font-family:inherit;cursor:pointer;border:0}
+input,textarea{font-family:inherit}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:24px;letter-spacing:-.5px}
+.logo .bubble{background:#fff;color:var(--red);width:42px;height:42px;border-radius:14px 14px 14px 4px;display:grid;place-items:center;font-size:24px;font-weight:900;box-shadow:0 4px 0 var(--dark)}
+.top-actions{display:flex;gap:8px}
+.top-actions button{background:rgba(255,255,255,.15);color:#fff;width:44px;height:44px;border-radius:13px;display:grid;place-items:center}
+.top-actions button:hover{background:rgba(255,255,255,.26)}
+.top-actions button.dim{opacity:.35}
+.top-actions svg{width:22px;height:22px}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 16px 32px}
+.screen{width:100%;max-width:900px;display:flex;flex-direction:column;align-items:center;gap:18px;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(14px)}}
+.panel{background:#fff;color:var(--deep);border-radius:28px;padding:24px;width:100%;max-width:580px;box-shadow:0 10px 0 var(--dark),0 26px 50px rgba(70,0,12,.35)}
+.panel.wide{max-width:720px}
+.panel h3{margin:16px 0 10px;font-size:15px;font-weight:800;color:var(--red);letter-spacing:.5px}
+.panel h3:first-child{margin-top:0}
+.center-text{text-align:center}
+.hero{text-align:center}
+.hero-title{font-size:clamp(50px,10vw,100px);font-weight:900;line-height:1;letter-spacing:-2px;text-shadow:0 7px 0 var(--dark)}
+.hero-sub{margin-top:14px;font-size:19px;font-weight:500;opacity:.95}
+.btn{border-radius:18px;padding:14px 22px;font-weight:900;font-size:18px;transition:transform .08s,box-shadow .08s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:translateY(4px);box-shadow:none!important}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 5px 0 var(--dark)}
+.btn-white{background:#fff;color:var(--red);box-shadow:0 7px 0 var(--dark)}
+.btn-outline{background:#fff;border:2.5px solid var(--red);color:var(--red)}
+.btn-ghost{background:transparent;border:2.5px dashed var(--line);color:var(--dark)}
+.btn.sm{font-size:14px;padding:8px 14px;border-radius:12px}
+.big{width:100%;font-size:22px;padding:18px;margin-top:20px}
+.xl{font-size:26px;padding:20px 46px;border-radius:22px}
+.team-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.team-row input{flex:1;min-width:0;border:2px solid var(--line);border-radius:13px;padding:11px 13px;font-size:17px;font-weight:700;color:var(--deep);background:#fff}
+.team-row input:focus{outline:none;border-color:var(--red)}
+.dot{width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:900;font-size:15px;flex:none}
+.icon-btn{width:38px;height:38px;border-radius:11px;background:var(--pink);color:var(--red);font-size:22px;font-weight:900;flex:none}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1.5px dashed var(--line);font-weight:700;flex-wrap:wrap}
+.opt:last-child{border-bottom:0}
+.seg{display:flex;background:var(--pink);border-radius:13px;padding:3px}
+.seg button{background:transparent;color:var(--dark);padding:7px 13px;border-radius:10px;font-weight:800;font-size:15px}
+.seg button.on{background:var(--red);color:#fff}
+.sw{width:52px;height:30px;border-radius:15px;background:var(--line);position:relative;flex:none}
+.sw::after{content:'';position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:right .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw.on{background:var(--red)}
+.sw.on::after{right:25px}
+.kicker{font-weight:800;font-size:21px;opacity:.92}
+.team-big{font-size:clamp(50px,11vw,116px);font-weight:900;line-height:1.02;text-shadow:0 7px 0 var(--dark);text-align:center;letter-spacing:-1.5px}
+.rules{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.rules span{border:2px dashed rgba(255,255,255,.6);border-radius:999px;padding:6px 15px;font-weight:700;font-size:15px}
+.mini{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:6px}
+.mini-t{background:rgba(255,255,255,.15);border-radius:14px;padding:8px 15px;display:flex;gap:12px;font-weight:700}
+.mini-t b{font-weight:900}
+.mini-t.on{background:#fff;color:var(--red)}
+.play-top{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pill{background:#fff;color:var(--dark);border-radius:999px;padding:9px 18px;font-weight:900;font-size:17px;white-space:nowrap}
+.pill.soft{background:rgba(255,255,255,.16);color:#fff}
+.ring{position:relative;width:118px;height:118px;flex:none}
+.ring svg{transform:rotate(-90deg);width:100%;height:100%}
+.rbg{fill:none;stroke:rgba(255,255,255,.22);stroke-width:10}
+.rfg{fill:none;stroke:#fff;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .12s linear}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;font-size:42px;font-weight:900}
+body.urgent .ring span{animation:pulse .5s infinite alternate}
+@keyframes pulse{to{transform:scale(1.18)}}
+.word-card{width:100%;background:#fff;border-radius:36px;padding:14px;box-shadow:0 12px 0 var(--dark),0 28px 54px rgba(60,0,10,.35)}
+.wc-inner{border:4px dashed var(--red);border-radius:26px;min-height:min(40vh,330px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px;text-align:center}
+.wc-label{color:var(--red);font-weight:800;letter-spacing:3px;font-size:15px}
+.wc-word{color:var(--deep);font-weight:900;font-size:clamp(42px,9vw,108px);line-height:1.05;word-break:break-word}
+.word-card.flip{animation:flip .3s ease}
+@keyframes flip{0%{transform:perspective(800px) rotateX(75deg);opacity:.2}100%{transform:none;opacity:1}}
+.play-btns{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;margin-top:6px}
+.btn-ok{background:#fff;color:var(--green);font-size:28px;padding:22px;box-shadow:0 7px 0 var(--dark)}
+.btn-skip{background:var(--dark);color:#fff;border:3px solid #fff;font-size:28px;padding:22px;box-shadow:0 7px 0 var(--deep)}
+.keys{font-size:14px;opacity:.75}
+.banner{background:var(--red);color:#fff;border-radius:18px;padding:12px;font-size:20px;font-weight:700}
+.banner b{display:block;font-size:30px;font-weight:900}
+.last-word{font-size:clamp(40px,8vw,84px);font-weight:900;color:var(--deep);padding:18px 0;border-bottom:3px dashed var(--red);margin-bottom:12px;line-height:1.1}
+.muted{color:#8a6a6f}
+.small{font-size:14px}
+.pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+.rv-head{display:flex;justify-content:space-between;align-items:center}
+.h2{font-size:30px;font-weight:900;color:var(--red);line-height:1.1}
+.pts{font-size:46px;font-weight:900;color:var(--red);background:var(--pink);border-radius:20px;padding:4px 20px}
+.rv-sum{display:flex;gap:10px;margin:14px 0 6px}
+.rv-sum span{border-radius:999px;padding:5px 14px;font-weight:800}
+.rv-sum .g{background:#EAF6EE;color:#14632F}
+.rv-sum .r{background:var(--pink);color:var(--dark)}
+.rv-list{display:flex;flex-direction:column;gap:7px;max-height:44vh;overflow:auto;padding:2px}
+.rv{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border-radius:13px;font-weight:800;font-size:19px;background:#EAF6EE;color:#14632F;border:2px solid #BFE3CB;width:100%;text-align:right}
+.rv.no{background:var(--pink);color:var(--dark);border-color:var(--line)}
+.lastline{margin-top:12px;background:var(--pink);border-radius:13px;padding:10px 14px;font-weight:700}
+.empty{padding:22px;text-align:center;color:#8a6a6f;border:2px dashed var(--line);border-radius:16px}
+.h-title{font-size:clamp(36px,7vw,60px);font-weight:900;text-shadow:0 5px 0 var(--dark)}
+.sub-w{font-weight:600;opacity:.9;margin-top:-10px}
+.track{display:flex;flex-direction:column;gap:12px;width:100%;max-width:760px}
+.lane{background:rgba(255,255,255,.13);border-radius:18px;padding:12px 16px;border:3px solid transparent}
+.lane.next{border-color:#fff;background:rgba(255,255,255,.2)}
+.lane-head{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:20px;margin-bottom:9px}
+.lane-head em{font-style:normal;background:#fff;color:var(--red);border-radius:999px;padding:2px 10px;font-size:13px;margin-right:8px;vertical-align:middle}
+.bar{height:20px;border-radius:10px;background:rgba(255,255,255,.22);position:relative;overflow:hidden}
+.bar i{position:absolute;top:0;bottom:0;right:0;background:#fff;border-radius:10px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.bar s{position:absolute;top:0;bottom:0;width:2px;background:rgba(142,11,32,.35)}
+.podium{display:flex;flex-direction:column;gap:8px;width:100%;max-width:440px}
+.pod{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.15);border-radius:14px;padding:10px 16px;font-size:19px}
+.pod:first-child{background:#fff;color:var(--red)}
+.pod span{font-weight:900;width:24px}
+.pod b{flex:1;font-weight:800}
+.pod em{font-style:normal;font-weight:900}
+.trophy{width:110px;height:110px}
+/* admin */
+.overlay{position:fixed;inset:0;background:rgba(55,0,10,.62);display:flex;align-items:flex-start;justify-content:center;padding:24px 12px;overflow:auto;z-index:50}
+.hidden{display:none!important}
+.adm{background:#fff;color:#2C2C2A;width:100%;max-width:980px;border-radius:24px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.35);animation:in .25s ease}
+.adm.pinbox{max-width:380px;margin-top:10vh}
+.adm-head{background:var(--red);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:16px 20px;font-weight:900;font-size:20px}
+.adm-head .x{background:rgba(255,255,255,.18);color:#fff;width:38px;height:38px;border-radius:11px;font-size:24px;line-height:1}
+.tabs{display:flex;gap:6px;padding:12px 16px 0;border-bottom:3px solid var(--red);overflow-x:auto}
+.tabs button{background:var(--pink);color:var(--dark);padding:10px 16px;font-weight:800;font-size:15px;border-radius:12px 12px 0 0;white-space:nowrap}
+.tabs button.on{background:var(--red);color:#fff}
+.adm-body{padding:20px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+.stat{background:var(--pink);border-radius:16px;padding:14px;text-align:center;color:var(--dark);font-weight:700}
+.stat b{display:block;font-size:34px;font-weight:900;color:var(--red);line-height:1.1}
+.tblwrap{overflow-x:auto;border-radius:14px;border:1.5px solid var(--line)}
+table.t{width:100%;border-collapse:collapse;font-size:15px;min-width:640px}
+.t th{background:var(--red);color:#fff;padding:10px;font-weight:800}
+.t td{padding:8px;border-bottom:1px solid var(--line);text-align:center;font-weight:600}
+.t tr:last-child td{border-bottom:0}
+.tname{border:1.5px solid var(--line);border-radius:9px;padding:6px 9px;font-weight:800;color:var(--deep);width:140px;font-size:15px}
+.score-ed{display:inline-flex;align-items:center;gap:8px}
+.score-ed b{font-size:20px;min-width:28px;color:var(--red);font-weight:900}
+.score-ed button{width:30px;height:30px;border-radius:9px;background:var(--pink);color:var(--red);font-size:18px;font-weight:900}
+.note{margin-top:14px;color:#8a6a6f;font-size:14px}
+.hist{border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+.hist-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--deep)}
+.badge{background:var(--red);color:#fff;border-radius:999px;padding:2px 12px;font-weight:900}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--pink);color:var(--deep);border-radius:999px;padding:6px 12px;font-weight:700;font-size:15px}
+.chip.ok{background:#EAF6EE;color:#14632F}
+.chip small{color:#9a7a7f;font-weight:600;font-size:12px}
+.chip button{width:22px;height:22px;border-radius:50%;background:#fff;color:var(--red);font-weight:900;font-size:15px;line-height:1;margin-left:-6px}
+.add-box{background:#FFF7F7;border-radius:18px;padding:14px;margin-bottom:18px}
+.lbl{display:block;font-weight:800;color:var(--red);margin-bottom:8px}
+textarea{width:100%;min-height:120px;border:2px dashed var(--red);border-radius:14px;padding:12px;font-size:16px;resize:vertical;background:#fff;color:var(--deep)}
+textarea:focus{outline:none;border-style:solid}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.row.between{justify-content:space-between;margin:0 0 12px}
+.set-sec{border:1.5px solid var(--line);border-radius:16px;padding:6px 16px;margin-bottom:14px;color:var(--deep)}
+.pin-in{width:100%;font-size:30px;text-align:center;letter-spacing:10px;border:2.5px solid var(--line);border-radius:14px;padding:10px;margin:8px 0 6px}
+.pin-in:focus{outline:none;border-color:var(--red)}
+.pin-small{width:130px;font-size:18px;letter-spacing:4px;padding:6px;border:2px solid var(--line);border-radius:10px;text-align:center}
+.err{color:var(--red);font-weight:700;min-height:22px;font-size:14px}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(8px)}50%{transform:translateX(-8px)}75%{transform:translateX(5px)}}
+.danger-zone{display:flex;gap:10px;flex-wrap:wrap}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);background:#fff;color:var(--dark);font-weight:800;padding:12px 22px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .3s;z-index:80;max-width:92vw;text-align:center}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:60;display:none}
+@media (max-width:560px){
+  .top{padding:10px 14px}.logo{font-size:20px}
+  .panel{padding:18px;border-radius:22px}
+  .ring{width:92px;height:92px}.ring span{font-size:32px}
+  .pill{font-size:14px;padding:7px 12px}
+  .btn-ok,.btn-skip{font-size:22px;padding:18px}
+  .xl{font-size:21px;padding:17px 30px}
+  .pts{font-size:34px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo"><span class="bubble">א</span><span>רפאל אליאס</span></div>
+  <div class="top-actions">
+    <button id="muteBtn" aria-label="צליל"></button>
+    <button id="adminBtn" aria-label="אזור מנהל" title="אזור מנהל"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.2"/></svg></button>
+  </div>
+</header>
+<main id="app"></main>
+<div id="admin" class="overlay hidden"></div>
+<div id="toast"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+const DEFAULT_WORDS=["צילוב","גרעינים לבנים","סבא לוי","סבתא ברכה","אבישי","משה","גילה","ליאת","דבי","מור","אסף","שי","בר","רוני","מאיה","מייקי","אוראל","אביה","אדיר","אגם","לירן","הילה","יפה","גדעון","הרב משה","ברוריה","זבולון","רפאל","אתרוג","אבזוש נבט","פלוב","אורז אדום","אורז ירוק","עשבי בשמים","חלאס","קציצה","חוג משה","קוקו קרטופי"];
+const KEY='rafael-alias-v1';
+const TEAM_DEFAULT=["קבוצה א'","קבוצה ב'","קבוצה ג'","קבוצה ד'","קבוצה ה'","קבוצה ו'"];
+const RING=2*Math.PI*52;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function fresh(){return{words:DEFAULT_WORDS.slice(),deck:[],settings:{time:60,target:20,skipPenalty:true,lastWord:true},setupNames:TEAM_DEFAULT.slice(0,2),teams:[],turn:0,turnCount:0,phase:'setup',history:[],round:null,pin:'1234',mute:false}}
+function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let S=Object.assign(fresh(),load()||{});
+S.settings=Object.assign(fresh().settings,S.settings||{});
+const app=$('#app');
+
+/* ---------- sound ---------- */
+let AC;
+function tone(f,d=.12,type='sine',v=.15,delay=0){if(S.mute)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
+const sOk=()=>{tone(880,.1);tone(1320,.14,'sine',.15,.08)};
+const sSkip=()=>tone(200,.18,'square',.07);
+const sTick=()=>tone(1100,.06,'square',.05);
+const sBuzz=()=>{tone(150,.8,'sawtooth',.18);tone(110,.8,'sawtooth',.12)};
+const sWin=()=>[523,659,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.16,i*.14));
+function renderMute(){$('#muteBtn').innerHTML=S.mute?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l4 6M21 9l-4 6"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>'}
+$('#muteBtn').onclick=()=>{S.mute=!S.mute;save();renderMute()};
+
+/* ---------- helpers ---------- */
+let toastT;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+function drawWord(){
+  if(!S.words.length)return '—';
+  if(!S.deck.length){
+    const used=new Set((S.round&&S.round.words||[]).map(x=>x.w));
+    let pool=S.words.filter(w=>!used.has(w));if(!pool.length)pool=S.words.slice();
+    const replay=S.history.length||(S.round&&S.round.words.length);
+    S.deck=shuffle(pool);
+    if(replay)toast('כל המילים שוחקו, החפיסה עורבבה מחדש');
+  }
+  return S.deck.pop();
+}
+function miniScores(){return `<div class="mini">${S.teams.map((t,i)=>`<div class="mini-t ${i===S.turn?'on':''}"><span>${esc(t.name)}</span><b>${t.score}</b></div>`).join('')}</div>`}
+function roundPoints(){const r=S.round;const ok=r.words.filter(x=>x.ok).length,sk=r.words.length-ok;return{ok,sk,pts:ok-(S.settings.skipPenalty?sk:0)}}
+function phaseLabel(){return({setup:'מסך פתיחה',ready:'ממתינים לתחילת סבב',play:'סבב פעיל',last:'מילה אחרונה',review:'סיכום סבב',board:'לוח התקדמות',win:'המשחק הסתיים'})[S.phase]||''}
+
+/* ---------- screens ---------- */
+function render(){
+  stopTimer();
+  ({setup:rSetup,ready:rReady,play:rPlay,last:rLast,review:rReview,board:rBoard,win:rWin}[S.phase]||rSetup)();
+  $('#adminBtn').classList.toggle('dim',S.phase==='play');
+}
+function seg(k,vals){return `<div class="seg">${vals.map(v=>`<button class="${S.settings[k]==v?'on':''}" data-act="seg" data-k="${k}" data-v="${v}">${v}</button>`).join('')}</div>`}
+function sw(k){return `<button class="sw ${S.settings[k]?'on':''}" data-act="sw" data-k="${k}" aria-pressed="${!!S.settings[k]}"></button>`}
+
+function rSetup(){
+  const n=S.setupNames;
+  app.innerHTML=`<section class="screen">
+  <div class="hero"><div class="hero-title">רפאל אליאס</div><div class="hero-sub">הסבירו את המילה בלי להגיד אותה. הכי הרבה מילים בזמן מנצח.</div></div>
+  <div class="panel">
+    <h3>הקבוצות</h3>
+    ${n.map((name,i)=>`<div class="team-row"><span class="dot">${i+1}</span><input value="${esc(name)}" data-team="${i}" maxlength="22" aria-label="שם קבוצה ${i+1}">${n.length>2?`<button class="icon-btn" data-act="delTeam" data-i="${i}" aria-label="הסרת קבוצה">×</button>`:''}</div>`).join('')}
+    ${n.length<6?'<button class="btn btn-ghost sm" data-act="addTeam">+ הוספת קבוצה</button>':''}
+    <h3>הגדרות</h3>
+    <div class="opt"><span>זמן לסבב (שניות)</span>${seg('time',[30,45,60,90])}</div>
+    <div class="opt"><span>ניקוד לניצחון</span>${seg('target',[10,20,30,50])}</div>
+    <div class="opt"><span>דילוג מוריד נקודה</span>${sw('skipPenalty')}</div>
+    <div class="opt"><span>המילה האחרונה</span>${sw('lastWord')}</div>
+    <button class="btn btn-red big" data-act="begin">יאללה, מתחילים</button>
+  </div></section>`;
+}
+function rReady(){
+  const t=S.teams[S.turn];
+  app.innerHTML=`<section class="screen">
+  <div class="kicker">התור של</div>
+  <div class="team-big">${esc(t.name)}</div>
+  <div class="rules"><span>מסבירים בלי להגיד את המילה</span><span>✔ נכון = נקודה</span><span>${S.settings.skipPenalty?'✖ דילוג = מינוס נקודה':'✖ דילוג בלי עונש'}</span>${S.settings.lastWord?'<span>המילה האחרונה פתוחה לכולם</span>':''}</div>
+  <button class="btn btn-white xl" data-act="start">התחל · ${S.settings.time} שניות</button>
+  ${miniScores()}</section>`;
+}
+function rPlay(){
+  const r=S.round,t=S.teams[r.team],ok=r.words.filter(x=>x.ok).length;
+  app.innerHTML=`<section class="screen">
+  <div class="play-top">
+    <span class="pill">${esc(t.name)}</span>
+    <div class="ring"><svg viewBox="0 0 120 120"><circle class="rbg" cx="60" cy="60" r="52"/><circle id="rfg" class="rfg" cx="60" cy="60" r="52" stroke-dasharray="${RING}" stroke-dashoffset="0"/></svg><span id="tleft">${r.dur}</span></div>
+    <span class="pill soft">✔ <b id="cOk">${ok}</b> · ✖ <b id="cSk">${r.words.length-ok}</b></span>
+  </div>
+  <div class="word-card" id="wordCard"><div class="wc-inner"><span class="wc-label">הסבירו את</span><span class="wc-word" id="word">${esc(r.current)}</span></div></div>
+  <div class="play-btns">
+    <button class="btn btn-ok" data-act="ok">✔ נכון</button>
+    <button class="btn btn-skip" data-act="skip">✖ דלג</button>
+  </div>
+  <div class="keys">מקלדת: רווח או חץ ימינה = נכון · X או חץ שמאלה = דלג</div>
+  </section>`;
+  startTimer();
+}
+function rLast(){
+  const w=S.round.last.w;
+  app.innerHTML=`<section class="screen"><div class="panel wide center-text">
+  <div class="banner">הזמן נגמר! <b>המילה האחרונה</b></div>
+  <div class="last-word">${esc(w)}</div>
+  <p class="muted">כל הקבוצות יכולות לנחש עכשיו. מי ניחשה ראשונה?</p>
+  <div class="pick">${S.teams.map((t,i)=>`<button class="btn ${i===S.round.team?'btn-red':'btn-outline'}" data-act="last" data-i="${i}">${esc(t.name)}</button>`).join('')}
+  <button class="btn btn-ghost" data-act="last" data-i="-1">אף אחת</button></div>
+  </div></section>`;
+}
+function rReview(){
+  const r=S.round,t=S.teams[r.team],p=roundPoints();
+  app.innerHTML=`<section class="screen"><div class="panel wide">
+  <div class="rv-head"><div><div class="muted">סיכום הסבב</div><div class="h2">${esc(t.name)}</div></div><div class="pts">${p.pts>0?'+':''}${p.pts}</div></div>
+  <div class="rv-sum"><span class="g">✔ ${p.ok} נכונות</span><span class="r">✖ ${p.sk} דילוגים</span></div>
+  <p class="muted small">טעות בסימון? לוחצים על מילה כדי להחליף בין נכון לדילוג.</p>
+  <div class="rv-list">${r.words.length?r.words.map((x,i)=>`<button class="rv ${x.ok?'':'no'}" data-act="toggle" data-i="${i}"><span>${esc(x.w)}</span><span>${x.ok?'✔':'✖'}</span></button>`).join(''):'<div class="empty">לא סומנו מילים בסבב הזה</div>'}</div>
+  ${r.last?`<div class="lastline">המילה האחרונה: <b>${esc(r.last.w)}</b> · ${r.last.winner!=null?'נקודה ל'+esc(S.teams[r.last.winner].name):'אף קבוצה לא ניחשה'}</div>`:''}
+  <button class="btn btn-red big" data-act="confirm">אישור וניקוד</button>
+  </div></section>`;
+}
+function rBoard(){
+  const tgt=S.settings.target,lead=Math.max(...S.teams.map(t=>t.score)),next=S.teams[S.turn];
+  const ticks=Array.from({length:4},(_,k)=>`<s style="right:${(k+1)*20}%"></s>`).join('');
+  app.innerHTML=`<section class="screen">
+  <div class="h-title">לוח ההתקדמות</div>
+  <div class="sub-w">היעד: ${tgt} נקודות · סיבוב ${Math.floor(S.turnCount/S.teams.length)+1}</div>
+  <div class="track">${S.teams.map((t,i)=>`<div class="lane ${i===S.turn?'next':''}"><div class="lane-head"><span>${esc(t.name)}${t.score===lead&&lead>0?'<em>מובילה</em>':''}</span><span>${t.score} / ${tgt}</span></div><div class="bar">${ticks}<i style="width:0%" data-w="${Math.min(100,t.score/tgt*100)}"></i></div></div>`).join('')}</div>
+  <button class="btn btn-white xl" data-act="next">התור של ${esc(next.name)} ←</button>
+  </section>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('.bar i').forEach(b=>b.style.width=b.dataset.w+'%')));
+}
+function rWin(){
+  const max=Math.max(...S.teams.map(t=>t.score)),ws=S.teams.filter(t=>t.score===max),sorted=[...S.teams].sort((a,b)=>b.score-a.score);
+  app.innerHTML=`<section class="screen">
+  <svg class="trophy" viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"><path d="M20 8h24v14a12 12 0 0 1-24 0z" fill="#fff"/><path d="M20 13h-8a8 8 0 0 0 9 10M44 13h8a8 8 0 0 1-9 10M32 34v10M22 54h20M25 44h14v10H25z"/></svg>
+  <div class="kicker">${ws.length>1?'תיקו!':'המנצחת'}</div>
+  <div class="team-big">${ws.map(t=>esc(t.name)).join(' + ')}</div>
+  <div class="podium">${sorted.map((t,i)=>`<div class="pod"><span>${i+1}</span><b>${esc(t.name)}</b><em>${t.score}</em></div>`).join('')}</div>
+  <button class="btn btn-white xl" data-act="new">משחק חדש</button>
+  </section>`;
+}
+
+/* ---------- game flow ---------- */
+let timerId=null,lastSec=null,lastTap=0;
+function startTimer(){stopTimer();lastSec=null;tick();timerId=setInterval(tick,100)}
+function stopTimer(){if(timerId)clearInterval(timerId);timerId=null;document.body.classList.remove('urgent')}
+function tick(){
+  if(S.phase!=='play'||!S.round){stopTimer();return}
+  const rem=Math.max(0,S.round.endsAt-Date.now()),sec=Math.ceil(rem/1000);
+  const el=$('#tleft');if(el)el.textContent=sec;
+  const fg=$('#rfg');if(fg)fg.style.strokeDashoffset=RING*(1-rem/(S.round.dur*1000));
+  document.body.classList.toggle('urgent',sec<=10&&rem>0);
+  if(sec!==lastSec){if(lastSec!==null&&sec<=5&&sec>0)sTick();lastSec=sec}
+  if(rem<=0)timeUp();
+}
+function startGame(){
+  const names=S.setupNames.map((s,i)=>s.trim()||TEAM_DEFAULT[i]);
+  S.teams=names.map(n=>({name:n,score:0,rounds:0,correct:0,skipped:0,lastWins:0}));
+  S.turn=0;S.turnCount=0;S.history=[];S.round=null;S.phase='ready';save();render();
+}
+function startRound(){
+  S.round={team:S.turn,words:[],current:null,dur:S.settings.time,endsAt:Date.now()+S.settings.time*1000,last:null};
+  S.round.current=drawWord();S.phase='play';save();render();
+}
+function answer(ok){
+  if(S.phase!=='play')return;
+  const now=Date.now();if(now-lastTap<230)return;lastTap=now;
+  S.round.words.push({w:S.round.current,ok});
+  ok?sOk():sSkip();
+  S.round.current=drawWord();save();
+  $('#word').textContent=S.round.current;
+  const c=$('#wordCard');c.classList.remove('flip');void c.offsetWidth;c.classList.add('flip');
+  const n=S.round.words.filter(x=>x.ok).length;$('#cOk').textContent=n;$('#cSk').textContent=S.round.words.length-n;
+}
+function timeUp(){
+  stopTimer();sBuzz();
+  if(S.settings.lastWord&&S.round.current&&S.round.current!=='—'){S.round.last={w:S.round.current,winner:null};S.phase='last'}
+  else{if(S.round.current&&S.round.current!=='—')S.deck.unshift(S.round.current);S.phase='review'}
+  S.round.current=null;save();render();
+}
+function confirmRound(){
+  const r=S.round,t=S.teams[r.team],{ok,sk,pts}=roundPoints();
+  t.score=Math.max(0,t.score+pts);t.rounds++;t.correct+=ok;t.skipped+=sk;
+  if(r.last&&r.last.winner!=null){const lw=S.teams[r.last.winner];lw.score++;lw.lastWins++}
+  S.history.push({n:S.history.length+1,team:r.team,teamName:t.name,words:r.words,last:r.last,pts,at:Date.now()});
+  S.round=null;S.turnCount++;
+  const n=S.teams.length;
+  if(S.turnCount%n===0&&Math.max(...S.teams.map(x=>x.score))>=S.settings.target){S.phase='win';save();render();confetti();sWin();return}
+  S.turn=(S.turn+1)%n;S.phase='board';save();render();
+}
+function newGame(){
+  if(S.teams.length)S.setupNames=S.teams.map(t=>t.name);
+  S.teams=[];S.history=[];S.round=null;S.turn=0;S.turnCount=0;S.phase='setup';save();render();
+}
+
+app.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const a=b.dataset.act,i=+b.dataset.i;
+  switch(a){
+    case 'begin':startGame();break;
+    case 'start':startRound();break;
+    case 'ok':answer(true);break;
+    case 'skip':answer(false);break;
+    case 'last':S.round.last.winner=i<0?null:i;S.phase='review';save();render();break;
+    case 'toggle':S.round.words[i].ok=!S.round.words[i].ok;save();rReview();break;
+    case 'confirm':confirmRound();break;
+    case 'next':S.phase='ready';save();render();break;
+    case 'new':newGame();break;
+    case 'addTeam':S.setupNames.push(TEAM_DEFAULT[S.setupNames.length]);save();rSetup();break;
+    case 'delTeam':S.setupNames.splice(i,1);save();rSetup();break;
+    case 'seg':S.settings[b.dataset.k]=+b.dataset.v;save();rSetup();break;
+    case 'sw':S.settings[b.dataset.k]=!S.settings[b.dataset.k];save();rSetup();break;
+  }
+});
+app.addEventListener('input',e=>{if(e.target.dataset.team!=null){S.setupNames[+e.target.dataset.team]=e.target.value;save()}});
+document.addEventListener('keydown',e=>{
+  if(!$('#admin').classList.contains('hidden')){if(e.key==='Escape')closeAdmin();return}
+  if(e.target.matches('input,textarea'))return;
+  if(S.phase==='play'){
+    if(['Space','Enter','ArrowRight'].includes(e.code)){e.preventDefault();answer(true)}
+    else if(['KeyX','ArrowLeft','Backspace'].includes(e.code)){e.preventDefault();answer(false)}
+  }
+});
+
+/* ---------- confetti ---------- */
+function confetti(){
+  const c=$('#confetti'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;c.style.display='block';
+  const cols=['#ffffff','#FFD1D8','#5E0615','#ffffff'];
+  const P=Array.from({length:200},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.6,r:5+Math.random()*7,vy:2+Math.random()*4,vx:-1.5+Math.random()*3,a:Math.random()*6,va:-.2+Math.random()*.4,col:cols[Math.floor(Math.random()*cols.length)]}));
+  let t=0;(function f(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.va;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.col;x.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6);x.restore()});if(++t<300)requestAnimationFrame(f);else{x.clearRect(0,0,c.width,c.height);c.style.display='none'}})();
+}
+
+/* ---------- admin ---------- */
+let admTab='data',admAuthed=false;
+const adm=$('#admin');
+$('#adminBtn').onclick=openAdmin;
+function openAdmin(){if(S.phase==='play'){toast('אזור המנהל זמין בין סבבים');return}adm.classList.remove('hidden');admAuthed?rAdmin():rPin()}
+function closeAdmin(){adm.classList.add('hidden');render()}
+function rPin(){
+  adm.innerHTML=`<div class="adm pinbox"><div class="adm-head"><span>אזור מנהל</span><button class="x" data-a="close" aria-label="סגירה">×</button></div>
+  <div class="adm-body center-text"><div style="font-weight:700;color:var(--deep)">הזינו קוד מנהל</div>
+  <input id="pin" class="pin-in" type="password" inputmode="numeric" maxlength="8" autocomplete="off">
+  <div id="pinErr" class="err"></div><button class="btn btn-red" style="width:100%" data-a="pin">כניסה</button></div></div>`;
+  setTimeout(()=>$('#pin')&&$('#pin').focus(),60);
+}
+function stat(v,l){return `<div class="stat"><b>${v}</b>${l}</div>`}
+function totals(){let ok=0,sk=0;S.history.forEach(h=>h.words.forEach(x=>x.ok?ok++:sk++));return{ok,sk}}
+function wordStats(){const m={};const add=(w,ok)=>{m[w]=m[w]||{ok:0,sk:0};ok?m[w].ok++:m[w].sk++};S.history.forEach(h=>{h.words.forEach(x=>add(x.w,x.ok));if(h.last)add(h.last.w,h.last.winner!=null)});return m}
+function aData(){
+  const {ok,sk}=totals(),rate=ok+sk?Math.round(ok/(ok+sk)*100):0;
+  return `<div class="stats">${stat(S.words.length,'מילים במאגר')}${stat(S.deck.length,'נותרו בחפיסה')}${stat(S.history.length,'סבבים ששוחקו')}${stat(rate+'%','אחוז הצלחה כללי')}</div>
+  ${S.teams.length?`<div class="tblwrap"><table class="t"><thead><tr><th>קבוצה</th><th>ניקוד</th><th>סבבים</th><th>נכונות</th><th>דילוגים</th><th>הצלחה</th><th>מילה אחרונה</th></tr></thead><tbody>
+  ${S.teams.map((t,i)=>{const r=t.correct+t.skipped?Math.round(t.correct/(t.correct+t.skipped)*100):0;return `<tr><td><input class="tname" data-tn="${i}" value="${esc(t.name)}" aria-label="שם קבוצה"></td><td><div class="score-ed"><button data-a="sc" data-i="${i}" data-d="-1" aria-label="הורדת נקודה">−</button><b>${t.score}</b><button data-a="sc" data-i="${i}" data-d="1" aria-label="הוספת נקודה">+</button></div></td><td>${t.rounds}</td><td>${t.correct}</td><td>${t.skipped}</td><td>${r}%</td><td>${t.lastWins}</td></tr>`}).join('')}
+  </tbody></table></div>`:'<div class="empty">עדיין לא התחיל משחק. הקבוצות והנתונים יופיעו כאן אחרי ההתחלה.</div>'}
+  <div class="note">מצב המשחק: ${phaseLabel()}${S.teams.length?' · התור הבא: '+esc(S.teams[S.turn].name):''}</div>`;
+}
+function aRounds(){
+  if(!S.history.length)return '<div class="empty">עדיין לא שוחקו סבבים</div>';
+  return S.history.slice().reverse().map(h=>{const name=(S.teams[h.team]||{}).name||h.teamName;const ok=h.words.filter(x=>x.ok).length;
+  return `<div class="hist"><div class="hist-h"><b>סבב ${h.n} · ${esc(name)}</b><span><span class="muted small">✔${ok} ✖${h.words.length-ok}</span> <span class="badge">${h.pts>0?'+':''}${h.pts}</span></span></div>
+  <div class="chips">${h.words.map(x=>`<span class="chip ${x.ok?'ok':''}">${x.ok?'✔':'✖'} ${esc(x.w)}</span>`).join('')||'<span class="muted">לא הוצגו מילים</span>'}</div>
+  ${h.last?`<div class="small muted" style="margin-top:8px">מילה אחרונה: ${esc(h.last.w)} · ${h.last.winner!=null?'ניחשה '+esc((S.teams[h.last.winner]||{}).name||''):'לא נוחשה'}</div>`:''}</div>`}).join('');
+}
+function aWords(){
+  const st=wordStats();
+  return `<div class="add-box"><label class="lbl" for="newWords">הוספת מילים · מילה או צירוף בכל שורה</label>
+  <textarea id="newWords" placeholder="מילה חדשה&#10;עוד מילה"></textarea>
+  <div class="row"><button class="btn btn-red" data-a="addw">הוספה למאגר</button><span id="addMsg" class="muted" style="font-weight:700"></span></div></div>
+  <div class="row between"><b style="color:var(--deep)">${S.words.length} מילים במאגר · ${S.deck.length} נותרו בחפיסה</b>
+  <div class="row" style="margin:0"><button class="btn btn-outline sm" data-a="reshuffle">ערבוב החפיסה מחדש</button><button class="btn btn-outline sm" data-a="restore">שחזור הרשימה המקורית</button></div></div>
+  <div class="chips">${S.words.map((w,i)=>{const s=st[w];return `<span class="chip">${esc(w)}${s?` <small>✔${s.ok} ✖${s.sk}</small>`:''}<button data-a="delw" data-i="${i}" aria-label="מחיקת ${esc(w)}">×</button></span>`}).join('')||'<span class="muted">המאגר ריק</span>'}</div>`;
+}
+function aSeg(k,vals){return `<div class="seg">${vals.map(v=>`<button class="${S.settings[k]==v?'on':''}" data-a="seg" data-k="${k}" data-v="${v}">${v}</button>`).join('')}</div>`}
+function aSw(k){return `<button class="sw ${S.settings[k]?'on':''}" data-a="sw" data-k="${k}" aria-pressed="${!!S.settings[k]}"></button>`}
+function aSettings(){
+  return `<div class="set-sec">
+  <div class="opt"><span>זמן לסבב (שניות)</span>${aSeg('time',[30,45,60,90,120])}</div>
+  <div class="opt"><span>ניקוד לניצחון</span>${aSeg('target',[10,20,30,50])}</div>
+  <div class="opt"><span>דילוג מוריד נקודה</span>${aSw('skipPenalty')}</div>
+  <div class="opt"><span>המילה האחרונה</span>${aSw('lastWord')}</div>
+  </div>
+  <div class="set-sec"><div class="opt"><span>החלפת קוד מנהל</span><span class="row" style="margin:0"><input id="newPin" class="pin-small" type="password" inputmode="numeric" maxlength="8" placeholder="קוד חדש"><button class="btn btn-red sm" data-a="setpin">שמירה</button></span></div></div>
+  <div class="danger-zone"><button class="btn btn-outline" data-a="newgame">משחק חדש (המילים נשמרות)</button><button class="btn btn-ghost" data-a="wipe">איפוס מלא</button></div>`;
+}
+function rAdmin(){
+  const tabs=[['data','נתונים וקבוצות'],['rounds','היסטוריית סבבים'],['words','מאגר מילים'],['settings','הגדרות']];
+  adm.innerHTML=`<div class="adm"><div class="adm-head"><span>אזור מנהל · רפאל אליאס</span><button class="x" data-a="close" aria-label="סגירה">×</button></div>
+  <div class="tabs">${tabs.map(([k,l])=>`<button class="${admTab===k?'on':''}" data-a="tab" data-k="${k}">${l}</button>`).join('')}</div>
+  <div class="adm-body">${({data:aData,rounds:aRounds,words:aWords,settings:aSettings})[admTab]()}</div></div>`;
+}
+function tryPin(){
+  const v=$('#pin').value;
+  if(v===S.pin){admAuthed=true;rAdmin()}
+  else{$('#pinErr').textContent='קוד שגוי. נסו שוב.';const p=$('#pin');p.classList.remove('shake');void p.offsetWidth;p.classList.add('shake');p.select()}
+}
+function addWords(){
+  const raw=$('#newWords').value.split(/\n|,/).map(s=>s.trim().replace(/\s+/g,' ')).filter(Boolean);
+  const have=new Set(S.words);let added=0,dup=0;
+  raw.forEach(w=>{if(have.has(w)){dup++;return}have.add(w);S.words.push(w);S.deck.splice(Math.floor(Math.random()*(S.deck.length+1)),0,w);added++});
+  save();rAdmin();
+  const m=$('#addMsg');if(m)m.textContent=raw.length?`נוספו ${added} מילים${dup?` · ${dup} כפולות סוננו`:''}`:'לא הוזנו מילים';
+}
+adm.addEventListener('click',e=>{
+  if(e.target===adm){closeAdmin();return}
+  const b=e.target.closest('[data-a]');if(!b)return;
+  const a=b.dataset.a,i=+b.dataset.i;
+  switch(a){
+    case 'close':closeAdmin();break;
+    case 'pin':tryPin();break;
+    case 'tab':admTab=b.dataset.k;rAdmin();break;
+    case 'sc':S.teams[i].score=Math.max(0,S.teams[i].score+(+b.dataset.d));save();rAdmin();break;
+    case 'addw':addWords();break;
+    case 'delw':{const w=S.words[i];S.words.splice(i,1);S.deck=S.deck.filter(x=>x!==w);save();rAdmin();toast(`"${w}" הוסרה מהמאגר`);break}
+    case 'reshuffle':S.deck=shuffle(S.words.slice());save();rAdmin();toast('החפיסה עורבבה מחדש');break;
+    case 'restore':if(confirm('לשחזר את רשימת המילים המקורית? מילים שנוספו יימחקו.')){S.words=DEFAULT_WORDS.slice();S.deck=[];save();rAdmin();toast('הרשימה המקורית שוחזרה')}break;
+    case 'seg':S.settings[b.dataset.k]=+b.dataset.v;save();rAdmin();break;
+    case 'sw':S.settings[b.dataset.k]=!S.settings[b.dataset.k];save();rAdmin();break;
+    case 'setpin':{const v=$('#newPin').value.trim();if(v.length<3){toast('קוד צריך לכלול לפחות 3 תווים');return}S.pin=v;save();rAdmin();toast('קוד המנהל עודכן');break}
+    case 'newgame':if(confirm('להתחיל משחק חדש? הניקוד וההיסטוריה יתאפסו, המילים יישמרו.')){newGame();adm.classList.add('hidden')}break;
+    case 'wipe':if(confirm('איפוס מלא ימחק הכול, כולל מילים שנוספו וקוד המנהל. להמשיך?')){S=fresh();save();admAuthed=false;adm.classList.add('hidden');render();renderMute()}break;
+  }
+});
+adm.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='pin')tryPin()});
+adm.addEventListener('change',e=>{if(e.target.dataset.tn!=null){const v=e.target.value.trim();if(v){S.teams[+e.target.dataset.tn].name=v;save()}}});
+
+renderMute();
+render();
+</script>
+</body>
+</html>
